@@ -1,0 +1,49 @@
+syntax = "proto3";
+
+package proto;
+
+option go_package = "gen/go";
+
+service UserService {
+  rpc GetUserByID(GetUserByIDRequest) returns (GetUserByIDResponse);
+  rpc GetNewUser(GetNewUserRequest) returns (GetNewUserResponse);
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse);
+}
+
+message User {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string created_at = 4;
+}
+
+message GetUserByIDRequest {
+  int64 user_id = 1;
+}
+
+message GetUserByIDResponse {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+}
+
+message GetNewUserRequest {
+  int64 id = 1;
+  string name = 2;
+  string email = 3;
+  string created_at = 4;
+}
+
+message GetNewUserResponse {
+  repeated User users = 1;
+}
+
+message CreateUserRequest {
+  string name = 1;
+  string email = 2;
+}
+
+message CreateUserResponse {
+  int64 id = 1;
+}
+
