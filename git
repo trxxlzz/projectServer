@@ -1,0 +1,15 @@
+*.exe
+*.out
+*.app
+*.bin
+
+# Кэш Go-модулей
+go.sum
+
+.idea/
+
+# VS Code
+.vscode/
+
+# Sublime Text
+*.sublime-workspace
