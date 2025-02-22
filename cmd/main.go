@@ -9,7 +9,9 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
-	grpcService "projectServer/internal/grpc"
+	"projectServer/internal/api"
+	"projectServer/internal/repository"
+	"projectServer/internal/service"
 	pb "projectServer/pkg/protos/gen/go"
 )
 
@@ -19,7 +21,7 @@ func main() {
 		panic(err)
 	}
 
-	err = goose.Up(db, "C:/Users/Nikita/GolandProjects/proj1/internal/migrations")
+	err = goose.Up(db, "./migrations")
 	if err != nil {
 		panic(err)
 	}
@@ -29,22 +31,23 @@ func main() {
 		db.Close()
 	}()
 
+	repo := &repository.UserRepo{DB: db}
+
+	userService := &service.UserService{Repo: repo}
+
+	apiService := &api.UserService{Service: userService}
+
+	grpcServer := grpc.NewServer()
+	pb.RegisterUserServiceServer(grpcServer, apiService)
+
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	grpcServer := grpc.NewServer()
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatal(err)
+	}
 
-	userService := &grpcService.UserService{Db: db}
-	pb.RegisterUserServiceServer(grpcServer, userService)
-
-	go func() {
-		log.Println("gRPC server listening on :50051")
-		if err := grpcServer.Serve(lis); err != nil {
-			log.Fatal(err)
-		}
-	}()
-
-	select {}
+	log.Println("Server is working!")
 }
